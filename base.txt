@@ -1,0 +1,128 @@
+DROP DATABASE IF EXISTS teleticket;
+CREATE DATABASE teleticket;
+
+USE teleticket;
+
+
+CREATE TABLE usuarios (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nombres VARCHAR(100),
+    apellidos VARCHAR(100),
+    email VARCHAR(150) UNIQUE,
+    password VARCHAR(255),
+    telefono VARCHAR(20),
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE sedes (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(150),
+    direccion VARCHAR(255),
+    ciudad VARCHAR(100),
+    capacidad INT
+);
+
+CREATE TABLE eventos (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(200),
+    descripcion TEXT,
+    fecha_evento DATETIME,
+    artista VARCHAR(150),
+    imagen VARCHAR(255),
+    sede_id BIGINT,
+
+    FOREIGN KEY (sede_id) REFERENCES sedes(id)
+);
+
+
+CREATE TABLE tipos_entrada (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100),
+    precio DECIMAL(10,2),
+    stock INT,
+    evento_id BIGINT,
+
+    FOREIGN KEY (evento_id) REFERENCES eventos(id)
+);
+
+CREATE TABLE compras (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    usuario_id BIGINT,
+    fecha_compra TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total DECIMAL(10,2),
+
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+);
+	
+CREATE TABLE tickets (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    codigo_qr VARCHAR(255) UNIQUE,
+    compra_id BIGINT,
+    tipo_entrada_id BIGINT,
+    cantidad INT,
+
+    FOREIGN KEY (compra_id) REFERENCES compras(id),
+    FOREIGN KEY (tipo_entrada_id) REFERENCES tipos_entrada(id)
+);	
+
+
+INSERT INTO usuarios (nombres, apellidos, email, password, telefono) VALUES
+('Juan', 'Perez', 'juan@gmail.com', '123456', '999111222'),
+('Maria', 'Lopez', 'maria@gmail.com', '123456', '988777666'),
+('Carlos', 'Ramirez', 'carlos@gmail.com', '123456', '977666555'),
+('Lucia', 'Torres', 'lucia@gmail.com', '123456', '966555444'),
+('Pedro', 'Gomez', 'pedro@gmail.com', '123456', '955444333');
+
+INSERT INTO sedes (nombre, direccion, ciudad, capacidad) VALUES
+('Estadio Nacional', 'Av. José Díaz', 'Lima', 50000),
+('Arena Lima', 'Av. Javier Prado', 'Lima', 15000),
+('Costa 21', 'Costa Verde', 'Lima', 20000),
+('Parque Central', 'Centro de Lima', 'Lima', 8000),
+('Estadio Monumental', 'Ate', 'Lima', 80000);
+
+INSERT INTO eventos (nombre, descripcion, fecha_evento, artista, imagen, sede_id) VALUES
+('Live in Lima', 'Concierto de rock internacional', '2025-10-18 20:00:00', 'Linkin Park', '/images/linkin.png', 2),
+('Chaos Tour', 'Show explosivo de metal', '2025-11-02 21:00:00', 'Slipknot', '/images/slipknot.png', 3),
+('System Live', 'Noche de rock alternativo', '2025-12-10 19:00:00', 'System of a Down', '/images/system.png', 4),
+('Metal Night', 'Concierto épico de metal', '2026-01-25 21:30:00', 'Metallica', '/images/metallica.png', 1),
+('Korn Experience', 'Evento exclusivo', '2026-02-14 20:00:00', 'Korn', '/images/korn.png', 2),
+('Megadeth Live', 'Thrash metal show', '2026-03-05 21:00:00', 'Megadeth', '/images/megadeth.png', 3),
+('Deftones Night', 'Rock alternativo en vivo', '2026-03-20 20:30:00', 'Deftones', '/images/deftones.png', 4),
+('Green Day Show', 'Punk rock night', '2026-04-10 21:00:00', 'Green Day', '/images/green.png', 5);
+
+INSERT INTO tipos_entrada (nombre, precio, stock, evento_id) VALUES
+('General', 120.00, 500, 1),
+('VIP', 180.00, 200, 1),
+
+('General', 150.00, 400, 2),
+('VIP', 220.00, 150, 2),
+
+('General', 130.00, 300, 3),
+('VIP', 200.00, 100, 3),
+
+('General', 160.00, 600, 4),
+('VIP', 250.00, 250, 4),
+
+('General', 140.00, 350, 5),
+('VIP', 190.00, 120, 5);
+
+INSERT INTO compras (usuario_id, total) VALUES
+(1, 300.00),
+(2, 220.00),
+(3, 180.00),
+(4, 500.00),
+(5, 120.00);
+
+INSERT INTO tickets (codigo_qr, compra_id, tipo_entrada_id, cantidad) VALUES
+('QR-ABC-001', 1, 1, 2),
+('QR-ABC-002', 1, 2, 1),
+
+('QR-DEF-001', 2, 3, 1),
+
+('QR-GHI-001', 3, 5, 1),
+
+('QR-JKL-001', 4, 7, 2),
+('QR-JKL-002', 4, 8, 1),
+
+('QR-MNO-001', 5, 9, 1);
+
